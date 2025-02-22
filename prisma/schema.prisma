@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Aquí irán los modelos más adelante 
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String
+  firstName     String
+  lastName      String
+  phone         String?
+  planType      PlanType       @default(FREE)
+  profiles      Profile[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Profile {
+  id                String              @id @default(uuid())
+  name             String
+  userId           String
+  user             User                @relation(fields: [userId], references: [id])
+  financialSystems FinancialSystem[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model FinancialSystem {
+  id                String              @id @default(uuid())
+  name             String
+  color            String
+  icon             String
+  currency         Currency
+  periodType       PeriodType          @default(MONTHLY)
+  profileId        String
+  profile          Profile             @relation(fields: [profileId], references: [id])
+  rules            FinancialRule[]
+  incomes          Income[]
+  expenses         Expense[]
+  reports          MonthlyReport[]
+  collaborators    Collaborator[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model FinancialRule {
+  id                String              @id @default(uuid())
+  name             String
+  percentage       Float
+  systemId         String
+  system           FinancialSystem     @relation(fields: [systemId], references: [id])
+  expenses         Expense[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model Income {
+  id                String              @id @default(uuid())
+  description      String
+  amount           Float
+  systemId         String
+  system           FinancialSystem     @relation(fields: [systemId], references: [id])
+  date             DateTime
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model Expense {
+  id                String              @id @default(uuid())
+  description      String
+  amount           Float
+  icon             String
+  categoryTag      String              // Para tags como "supermercado", "restaurante", etc.
+  systemId         String
+  system           FinancialSystem     @relation(fields: [systemId], references: [id])
+  ruleId           String
+  rule             FinancialRule       @relation(fields: [ruleId], references: [id])
+  date             DateTime
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model Collaborator {
+  id                String              @id @default(uuid())
+  systemId         String
+  system           FinancialSystem     @relation(fields: [systemId], references: [id])
+  profileId        String              // ID del perfil invitado
+  percentage       Float               // Porcentaje de participación en el sistema
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model MonthlyReport {
+  id                String              @id @default(uuid())
+  systemId         String
+  system           FinancialSystem     @relation(fields: [systemId], references: [id])
+  month            Int
+  year             Int
+  totalIncome      Float
+  totalExpense     Float
+  rulesSummary     Json                // Resumen de gastos por regla
+  categorySummary  Json                // Resumen de gastos por categoría
+  createdAt        DateTime            @default(now())
+}
+
+enum PlanType {
+  FREE            // 1 sistema financiero
+  PREMIUM         // 2 sistemas financieros
+  PLUS            // 4 sistemas financieros
+}
+
+enum Currency {
+  CLP
+  USD
+  EUR
+  ARS
+  BRL
+  MXN
+  PEN
+  COP
+  BOB
+  UYU
+}
+
+enum PeriodType {
+  MONTHLY
+  QUARTERLY
+  BIANNUAL
+} 
