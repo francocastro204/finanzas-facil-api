@@ -35,6 +35,12 @@ app.use('/api/transactions', transactionRoutes);
 // app.use('/api/collaborators', collaboratorRoutes);
 // app.use('/api/incomes', incomeRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-}); 
+// Para Vercel, exportamos la app
+export default app;
+
+// Solo escuchamos si no estamos en Vercel
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
+} 
