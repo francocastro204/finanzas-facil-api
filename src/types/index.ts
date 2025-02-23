@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { Prisma } from '@prisma/client';
+import { AccountType, TransactionType, Currency, PeriodType } from '@prisma/client';
 
 export interface AuthRequest extends Request {
   user: {
@@ -31,8 +31,8 @@ export interface ProfileInput {
 export interface FinancialSystemInput {
   name: string;
   color: string;
-  currency: Prisma.Currency;
-  periodType?: Prisma.PeriodType;
+  currency: Currency;
+  periodType?: PeriodType;
 }
 
 // Financial Rule Types
@@ -65,18 +65,18 @@ export interface CollaboratorInput {
 
 export interface AccountInput {
   name: string;
-  type: Prisma.AccountType;
+  type: AccountType;
   balance?: number;
 }
 
 export interface CategoryInput {
   name: string;
-  type: Prisma.TransactionType;
+  type: TransactionType;
 }
 
 export interface TransactionInput {
   amount: number;
-  type: Prisma.TransactionType;
+  type: TransactionType;
   description: string;
   date: Date;
   accountId: string;

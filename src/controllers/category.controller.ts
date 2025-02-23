@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { PrismaClient, TransactionType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { CategoryInput, AuthRequest } from '../types';
 
 const prisma = new PrismaClient();
@@ -12,7 +12,7 @@ type PrismaError = {
 export class CategoryController {
   static async create(req: AuthRequest, res: Response) {
     try {
-      const { name, type } = req.body;
+      const { name, type }: CategoryInput = req.body;
       const userId = req.user.id;
 
       console.log('Creating category with data:', { name, type, userId });
@@ -20,7 +20,7 @@ export class CategoryController {
       const category = await prisma.category.create({
         data: {
           name,
-          type: type as TransactionType,
+          type,
           userId
         }
       });

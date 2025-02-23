@@ -1,45 +1,17 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { FinancialSystemInput } from '../types';
 
 const prisma = new PrismaClient();
 
 export class FinancialSystemService {
   static async create(profileId: string, input: FinancialSystemInput) {
-    const { name, color, currency, periodType } = input;
-
-    // Crear sistema financiero
-    const system = await prisma.financialSystem.create({
+    return prisma.financialSystem.create({
       data: {
-        name,
-        color,
-        icon: '💰', // TODO: Implementar servicio de IA para seleccionar icono
-        currency,
-        periodType,
+        ...input,
         profileId,
-        // Crear reglas financieras por defecto (50/30/20)
-        rules: {
-          create: [
-            {
-              name: 'Necesidades',
-              percentage: 50
-            },
-            {
-              name: 'Deseos',
-              percentage: 30
-            },
-            {
-              name: 'Ahorros',
-              percentage: 20
-            }
-          ]
-        }
-      },
-      include: {
-        rules: true
+        icon: '💰' // default icon
       }
     });
-
-    return system;
   }
 
   static async getByProfile(profileId: string) {
@@ -47,11 +19,7 @@ export class FinancialSystemService {
       where: { profileId },
       include: {
         rules: true,
-        collaborators: {
-          include: {
-            profile: true
-          }
-        }
+        collaborators: true
       }
     });
   }

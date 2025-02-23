@@ -34,29 +34,20 @@ export class CollaboratorService {
         systemId,
         profileId,
         percentage
-      },
-      include: {
-        profile: true
       }
     });
   }
 
   static async getBySystem(systemId: string) {
     return prisma.collaborator.findMany({
-      where: { systemId },
-      include: {
-        profile: true
-      }
+      where: { systemId }
     });
   }
 
   static async update(id: string, percentage: number) {
     return prisma.collaborator.update({
       where: { id },
-      data: { percentage },
-      include: {
-        profile: true
-      }
+      data: { percentage }
     });
   }
 

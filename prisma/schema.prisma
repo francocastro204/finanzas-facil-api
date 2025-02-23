@@ -22,6 +22,8 @@ model User {
   planType      PlanType       @default(FREE)
   profiles      Profile[]
   accounts      Account[]
+  categories    Category[]
+  transactions  Transaction[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
@@ -115,14 +117,42 @@ model MonthlyReport {
 }
 
 model Account {
-  id        String   @id @default(uuid())
-  name      String
-  type      String   // "CHECKING", "SAVINGS", "CREDIT"
-  balance   Float    @default(0)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(uuid())
+  name         String
+  type         AccountType   // Cambiado de String a AccountType
+  balance      Float        @default(0)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String
+  type         TransactionType
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  amount      Float
+  type        TransactionType
+  description String
+  date        DateTime
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum PlanType {
@@ -148,4 +178,15 @@ enum PeriodType {
   MONTHLY
   QUARTERLY
   BIANNUAL
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CREDIT
 } 
