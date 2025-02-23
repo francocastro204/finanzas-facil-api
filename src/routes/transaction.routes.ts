@@ -5,8 +5,9 @@ import { RequestHandler } from 'express';
 
 const router = Router();
 
-router.use(authMiddleware);
-router.post('/', TransactionController.createTransaction as RequestHandler);
-router.get('/', TransactionController.getTransactions as RequestHandler);
+router.use(authMiddleware as unknown as RequestHandler);
+
+router.post('/', TransactionController.create as unknown as RequestHandler);
+router.get('/', TransactionController.getTransactions as unknown as RequestHandler);
 
 export default router;

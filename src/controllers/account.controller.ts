@@ -5,10 +5,12 @@ import { AccountInput, AuthRequest } from '../types';
 const prisma = new PrismaClient();
 
 export class AccountController {
-  static async createAccount(req: AuthRequest, res: Response) {
+  static async create(req: AuthRequest, res: Response) {
     try {
       const { name, type, balance = 0 }: AccountInput = req.body;
       const userId = req.user.id;
+
+      console.log('Creating account with data:', { name, type, balance, userId }); // Debug log
 
       const account = await prisma.account.create({
         data: {
@@ -21,7 +23,12 @@ export class AccountController {
 
       res.json(account);
     } catch (error) {
-      res.status(500).json({ error: 'Error al crear la cuenta' });
+      console.error('Error creating account:', error);
+      if (error instanceof Error) {
+        res.status(400).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Error al crear la cuenta' });
+      }
     }
   }
 
@@ -32,6 +39,7 @@ export class AccountController {
       });
       res.json(accounts);
     } catch (error) {
+      console.error('Error getting accounts:', error);
       res.status(500).json({ error: 'Error al obtener las cuentas' });
     }
   }

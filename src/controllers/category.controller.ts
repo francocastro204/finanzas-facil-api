@@ -1,25 +1,51 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TransactionType } from '@prisma/client';
 import { CategoryInput, AuthRequest } from '../types';
 
 const prisma = new PrismaClient();
 
+type PrismaError = {
+  code: string;
+  message: string;
+};
+
 export class CategoryController {
-  static async createCategory(req: AuthRequest, res: Response) {
+  static async create(req: AuthRequest, res: Response) {
     try {
-      const { name, type }: CategoryInput = req.body;
+      const { name, type } = req.body;
       const userId = req.user.id;
+
+      console.log('Creating category with data:', { name, type, userId });
 
       const category = await prisma.category.create({
         data: {
           name,
-          type,
+          type: type as TransactionType,
           userId
         }
       });
 
       res.json(category);
     } catch (error) {
+      console.error('Error creating category:', error);
+      
+      // Manejo de errores de Prisma
+      const prismaError = error as PrismaError;
+      if (prismaError.code) {
+        switch (prismaError.code) {
+          case 'P2002':
+            return res.status(400).json({ error: 'Ya existe una categoría con ese nombre' });
+          case 'P2003':
+            return res.status(400).json({ error: 'Usuario no encontrado' });
+          default:
+            return res.status(400).json({ error: `Error de base de datos: ${prismaError.message}` });
+        }
+      }
+
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+
       res.status(500).json({ error: 'Error al crear la categoría' });
     }
   }
@@ -31,6 +57,7 @@ export class CategoryController {
       });
       res.json(categories);
     } catch (error) {
+      console.error('Error getting categories:', error);
       res.status(500).json({ error: 'Error al obtener las categorías' });
     }
   }

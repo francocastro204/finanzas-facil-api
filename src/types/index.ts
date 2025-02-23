@@ -2,11 +2,10 @@ import { Request } from 'express';
 import { Prisma } from '@prisma/client';
 
 export interface AuthRequest extends Request {
-  user: Prisma.UserGetPayload<{
-    include: {
-      profiles: true;
-    };
-  }>;
+  user: {
+    id: string;
+    email: string;
+  };
 }
 
 // Auth Types
