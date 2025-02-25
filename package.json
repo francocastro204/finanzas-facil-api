@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "vercel-build": "prisma generate && tsc",
+    "postinstall": "prisma generate",
     "studio": "prisma studio"
   },
   "keywords": [],
